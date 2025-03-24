@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 # pip install pymupdf
 import fitz #PyMuPDF
+from prompt import prompt
 # Cargar variables de entorno desde .env
 load_dotenv()
 # Obtener la clave de la API desde el archivo .env
@@ -23,3 +24,38 @@ def extraer_texto_pdf(ruta_pdf):
     texto = "\n".join([pagina.get_text() for pagina in doc]) #Extraer el texto de cada página
     return texto
 
+# Configurar la clave de API
+genai.configure(api_key=api_key)
+
+def estructurar_texto(texto):
+    """
+    Envía el texto a Gemini para obtener una respuesta estructurada en CSV.
+    Si no puede procesarlo, devuelve 'error'.
+    """
+
+    # Definir el modelo de Gemini
+    model = genai.GenerativeModel("gemini-2.0-flash")  # Puedes probar otros modelos
+
+    # Definir el mensaje en el formato correcto
+    mensajes = [
+        {
+            "parts": [{"text": 
+                "Eres un experto en extracción de datos de facturas. "
+                "Devuelve solo el CSV sin explicaciones ni mensajes adicionales. "
+                "Si no puedes extraer datos, devuelve exactamente la palabra 'error'.\n\n"
+                f"{prompt} \nEste es el texto a parsear:\n{texto}"
+            }]
+        }
+    ]
+
+    # try:
+    # Generar respuesta
+    respuesta = model.generate_content(mensajes)
+
+    # Obtener el contenido y eliminar espacios extra
+    csv_respuesta = respuesta.text.strip()
+    
+    return csv_respuesta
+
+    # except Exception as e:
+    #     return e
