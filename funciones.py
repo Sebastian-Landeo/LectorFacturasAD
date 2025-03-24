@@ -5,6 +5,8 @@ import os
 # pip install pymupdf
 import fitz #PyMuPDF
 from prompt import prompt
+import pandas as pd
+from io import StringIO
 # Cargar variables de entorno desde .env
 load_dotenv()
 # Obtener la clave de la API desde el archivo .env
@@ -59,3 +61,20 @@ def estructurar_texto(texto):
 
     # except Exception as e:
     #     return e
+
+def csv_a_dataframe(csv):
+    """Convierte el texto CSV en un DataFrame de pandas"""
+
+    # Definir el tipo de dato para cada columna
+    dtype_cols = {
+        "fecha_factura": str,
+        "cantidad": int,
+        "descripcion": str,
+        "valor_unitario": float,
+        "descuento": float,
+    }
+
+    # Leer el CSV en un DataFrame con los tipos especificados
+    df_temp = pd.read_csv(StringIO(csv), delimiter=";", dtype=dtype_cols)
+
+    return df_temp

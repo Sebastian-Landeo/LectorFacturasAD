@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 import funciones
 
 # Crear un dataframe vacío para almacener todos las facturas
-df = pd.DataFrame()
+
 
 # Recorrer todos carpetas dentro de la carpeta "Facturas"
 """
@@ -36,6 +36,7 @@ meses = {
 }
 
 def obtener_dataframes(mes):
+    df = pd.DataFrame()
     ruta_carpeta = os.path.join("./Facturas", mes)
 
     # Contador para limitar a 15 archivos
@@ -58,11 +59,22 @@ def obtener_dataframes(mes):
 
         # Estructurar el texto de la factura
         texto_estructurado = funciones.estructurar_texto(texto_no_estructurado)
+
+        # Convertir el texto estructurado en un DataFrame
+        df_factura = funciones.csv_a_dataframe(texto_estructurado)
+
+        # Anexar el dataframe de la factura al dataframe general
+        df = pd.concat([df, df_factura], ignore_index=True)
         
         print(texto_estructurado)
         # Incrementar el contador
         contador += 1
+        df.to_csv(f"{mes}.csv", index=False)
 
-obtener_dataframes(meses[3])
+    return df
+
+# Exportar
+df = obtener_dataframes(meses[1])
+
 
 print("finalizado")
