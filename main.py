@@ -47,14 +47,16 @@ def obtener_dataframes(mes):
 
         # Estructurar el texto de la factura
         texto_estructurado = funciones.estructurar_texto(texto_no_estructurado)
+        print(texto_estructurado)
 
         # Convertir el texto estructurado en un DataFrame
-        df_factura = funciones.csv_a_dataframe(texto_estructurado)
+        df_factura = funciones.csv_a_dataframe(texto_estructurado, archivo)
+        print(df_factura["numero_factura"])
 
         # Anexar el dataframe de la factura al dataframe general
         df = pd.concat([df, df_factura], ignore_index=True)
         
-        print(texto_estructurado)
+       
         # Incrementar el contador
         contador += 1
         # Exportar a CSV
@@ -80,8 +82,8 @@ def insertar_datos(tabla, columnas):
         cursor.execute(sql, tuple(row))
 
 
-# Insertar en cada tabla de dimensión (excepto dim_departamento)
-insertar_datos('factura', ['fecha_factura', 'cantidad', 'descripcion', 'valor_unitario', 'descuento'])
+# Insertar datos en la tabla 'factura'
+insertar_datos('factura', ['numero_factura', 'fecha_factura', 'cantidad', 'descripcion', 'valor_unitario', 'descuento', 'proveedor'])
 
 # Confirmar cambios y cerrar conexión
 conn.commit()

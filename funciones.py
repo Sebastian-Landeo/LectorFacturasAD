@@ -62,12 +62,11 @@ def estructurar_texto(texto):
     # except Exception as e:
     #     return e
 
-def csv_a_dataframe(csv, archivo):
+def csv_a_dataframe(csv, numero_factura):
     """Convierte el texto CSV en un DataFrame de pandas"""
-
+    numero_factura = numero_factura.replace("PDF-DOC-", "").replace(".pdf", "")
     # Definir el tipo de dato para cada columna
     dtype_cols = {
-        # "archivo": str,
         "fecha_factura": str,
         "cantidad": float,
         "descripcion": str,
@@ -77,5 +76,6 @@ def csv_a_dataframe(csv, archivo):
 
     # Leer el CSV en un DataFrame con los tipos especificados
     df_temp = pd.read_csv(StringIO(csv), delimiter=";", dtype=dtype_cols)
+    df_temp["numero_factura"] = numero_factura
 
     return df_temp
