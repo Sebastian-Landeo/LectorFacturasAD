@@ -62,13 +62,14 @@ def estructurar_texto(texto):
     # except Exception as e:
     #     return e
 
-def csv_a_dataframe(csv):
+def csv_a_dataframe(csv, archivo):
     """Convierte el texto CSV en un DataFrame de pandas"""
 
     # Definir el tipo de dato para cada columna
     dtype_cols = {
+        # "archivo": str,
         "fecha_factura": str,
-        "cantidad": int,
+        "cantidad": float,
         "descripcion": str,
         "valor_unitario": float,
         "descuento": float,

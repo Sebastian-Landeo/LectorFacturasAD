@@ -1,32 +1,20 @@
 import pandas as pd
 import os
-from sqlalchemy import create_engine
+import pymysql
 import funciones
-
-# Crear un dataframe vacío para almacener todos las facturas
-
-
-# Recorrer todos carpetas dentro de la carpeta "Facturas"
-"""
-    for carpeta in sorted(os.listdir("./Facturas")):
-        ruta_carpeta = os.path.join("./Facturas", carpeta)
-
-        # Recorrer todos los archivos dentro de la carpeta
-        for archivo in os.listdir(ruta_carpeta):
-            ruta_pdf = os.path.join(ruta_carpeta, archivo)
-            print("-" * 50)
-            print(f"Procesando {ruta_pdf}")
-
-            # Extraer el texto de la factura
-            texto_no_estructurado = funciones.extraer_texto_pdf(ruta_pdf)
-            # print("-" * 50)
-            # print(texto_no_estructurado)
-
-            # Estructurar el texto de la factura
-            texto_estructurado = funciones.estructurar_texto(texto_no_estructurado)
-            
-            print(texto_estructurado)
-"""
+from dotenv import load_dotenv
+# Cargar variables de entorno desde .env
+load_dotenv()
+DB_USER = os.getenv('DB_USER')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_HOST = os.getenv('DB_HOST')
+DB_NAME = os.getenv('DB_NAME')
+DB_PORT = int(os.getenv('DB_PORT'))
+# Crear la conexión a MySQL
+conn = pymysql.connect(
+    host=DB_HOST, user=DB_USER, password=DB_PASSWORD, database=DB_NAME, port=DB_PORT
+)
+cursor = conn.cursor()
 
 # Adaptando para keys de uso gratuito
 meses = {
@@ -69,12 +57,35 @@ def obtener_dataframes(mes):
         print(texto_estructurado)
         # Incrementar el contador
         contador += 1
+        # Exportar a CSV
         df.to_csv(f"{mes}.csv", index=False)
 
     return df
 
-# Exportar
-df = obtener_dataframes(meses[1])
+# Obtner el DataFrame de un mes específico
+df = obtener_dataframes(meses[8])
 
+# Función para insertar valores en otras tablas
+def insertar_datos(tabla, columnas):
+    valores = df[list(columnas)].copy()  # Copia para evitar modificar el DataFrame original
+
+    # Convertir la fecha al formato correcto (YYYY-MM-DD)
+    if 'fecha_factura' in valores.columns:
+        valores['fecha_factura'] = pd.to_datetime(valores['fecha_factura'], format='%d/%m/%Y').dt.strftime('%Y-%m-%d')
+
+    placeholders = ', '.join(['%s'] * len(columnas))
+    sql = f"INSERT INTO {tabla} ({', '.join(columnas)}) VALUES ({placeholders})"
+
+    for _, row in valores.iterrows():
+        cursor.execute(sql, tuple(row))
+
+
+# Insertar en cada tabla de dimensión (excepto dim_departamento)
+insertar_datos('factura', ['fecha_factura', 'cantidad', 'descripcion', 'valor_unitario', 'descuento'])
+
+# Confirmar cambios y cerrar conexión
+conn.commit()
+cursor.close()
+conn.close()
 
 print("finalizado")
