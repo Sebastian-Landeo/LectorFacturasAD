@@ -17,3 +17,18 @@ ALTER TABLE factura
 ADD COLUMN numero_factura VARCHAR(255);
 ALTER TABLE factura
 ADD COLUMN proveedor VARCHAR(255);
+
+DELETE FROM factura; 
+
+
+SELECT 
+    DATE_FORMAT(fecha_factura, '%Y-%m') AS mes,
+    COUNT(*) AS total_facturas,
+    SUM(cantidad) AS total_productos,
+    SUM(cantidad*valor_unitario*1.18) AS 'Total a pagar'
+FROM 
+    factura
+GROUP BY 
+    DATE_FORMAT(fecha_factura, '%Y-%m')
+ORDER BY 
+    mes;

@@ -65,7 +65,7 @@ def obtener_dataframes(mes):
     return df
 
 # Obtner el DataFrame de un mes específico
-df = obtener_dataframes(meses[8])
+df = obtener_dataframes(meses[12])
 
 # Función para insertar valores en otras tablas
 def insertar_datos(tabla, columnas):

@@ -72,6 +72,7 @@ def csv_a_dataframe(csv, numero_factura):
         "descripcion": str,
         "valor_unitario": float,
         "descuento": float,
+        "proveedor": str,
     }
 
     # Leer el CSV en un DataFrame con los tipos especificados
