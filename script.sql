@@ -32,3 +32,5 @@ GROUP BY
     DATE_FORMAT(fecha_factura, '%Y-%m')
 ORDER BY 
     mes;
+    
+DELETE FROM factura WHERE numero_factura = 'E0018320566145678';
